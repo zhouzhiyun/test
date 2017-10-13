@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+	<meta charset="utf-8">
+    <title>canvas</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        canvas{
+            border:1px solid #333;
+            margin:20px;
+        }
+        #shape{
+            cursor: pointer;
+            margin-left:20px;
+        }
+        #shape input{
+            padding:2px 5px;
+            min-width:40px;
+            margin-left:5px;
+        }
+    </style>
+</head>
+
+<body>
+  <canvas width="500" height="400" id="canvas">
+      <span>您的浏览器不支持canvas</span>
+  </canvas>
+  
+  <div id="shape">
+    <input type="button" value="画笔" id="line">
+    <input type="button" value="清除" id="clear">
+    <input type="button" value="撤销" id="cancel">
+    <input type="button" value="橡皮檫" id="eraser">
+    <input type="button" value="圆" id="circle">
+    <input type="color" id="color">
+    <input type="range" id="pen">
+
+  </div>
+  
+</body>
+<script>    
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var shape="线";
+    var drawing = false;
+    var radius = 25;  
+    var lastImg=[];
+    var color=document.getElementById('color');
+    document.getElementById('shape').onclick=function(e){
+        var target=e.target;
+        if(target.nodeName.toLowerCase()=='span'){
+            shape=target.innerHTML;
+        }
+    }
+   //画笔
+    document.getElementById('line').onclick=function(){       
+        canvas.onmousedown = function(ev){
+            var ev = ev || event;            
+            ctx.lineWidth=2;                
+            ctx.beginPath();
+            lastImg.push(ctx.getImageData(0,  0,  canvas.width,  canvas.height));
+            ctx.moveTo(ev.clientX-canvas.offsetLeft,ev.clientY-canvas.offsetTop);
+            document.onmousemove = function(ev){
+                var ev = ev || event;
+                ctx.lineTo(ev.clientX - canvas.offsetLeft,ev.clientY - canvas.offsetTop);
+                ctx.stroke();    
+            }
+            document.onmouseup = function(ev){
+                document.onmousemove = document.onmouseup = null;
+                ctx.closePath();
+            }            
+        }        
+    }
+    //清除
+    document.getElementById('clear').onclick=function(){
+        // canvas.height=canvas.height;//重置canvas高度可清除canvas
+        ctx.clearRect(0,0,canvas.width,canvas.width);
+    }
+    //橡皮擦
+    document.getElementById('eraser').onclick=function(){
+        canvas.onmousedown = function(e){
+            var first = getBoundingClientRect(e.clientX,e.clientY);
+            drawCanvas(first.x,first.y)
+            drawing = true;
+            lastImg.push(ctx.getImageData(0,  0,  canvas.width,  canvas.height));
+            
+        }
+        canvas.onmousemove = function(e){
+            if(drawing){
+                var move = getBoundingClientRect(e.clientX,e.clientY);
+                drawCanvas(move.x,move.y);
+            }
+        }
+        canvas.onmouseup = function(){
+            drawing = false;
+        }
+    };
+    function getBoundingClientRect(x,y){
+        var box = canvas.getBoundingClientRect();    //获取canvas的距离浏览器视窗的上下左右距离
+        return {x:x-box.left,
+                y:y-box.top
+        }
+    }
+    function drawCanvas(x,y){
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x,y,radius,0,Math.PI*2,false)
+        ctx.clip();
+        ctx.clearRect(0,0,canvas.width,canvas.height)
+        ctx.restore()
+    }
+    document.getElementById('cancel').onclick=function(){
+        if(lastImg==""){
+            return;
+        }else{
+            ctx.putImageData(lastImg[lastImg.length-1],  0,  0) ;
+            lastImg.pop();
+        }
+    };
+    
+    document.getElementById('circle').onclick=function(){       
+        canvas.onmousedown = function(ev){
+            var ev = ev || event;            
+            ctx.lineWidth=2;                
+            ctx.beginPath();
+            lastImg.push(ctx.getImageData(0,  0,  canvas.width,  canvas.height));
+            ctx.arc(circle.x, circle.y, circle.r, 0, Math.PI * 2, true); 
+            ctx.moveTo(ev.clientX-canvas.offsetLeft,ev.clientY-canvas.offsetTop);
+            cxt.beginPath();
+            document.onmousemove = function(ev){
+                var ev = ev || event;
+                ctx.lineTo(ev.clientX - canvas.offsetLeft,ev.clientY - canvas.offsetTop);
+                ctx.stroke();    
+                cxt.arc(70,18,15,0,Math.PI*2,true);
+                cxt.closePath();
+                cxt.fill();
+            }
+            document.onmouseup = function(ev){
+                document.onmousemove = document.onmouseup = null;
+                ctx.closePath();
+            }            
+        }        
+    }
+    
+</script>
+</html>
