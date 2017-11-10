@@ -1,11 +1,48 @@
-����Զ�̷�֧��
+连接远程分支：
 git init
 git add .
-git commit -m "��ʾ��Ϣ"
+git commit -m "提示信息"
 git remote add origin git@github.com:your name/repository name.git
 git push origin master
 
-�鿴Զ�̷�֧
+查看远程分支
 git branch -a
 
 git checkout 
+
+<!-- Git 合并远程分支 https://www.tuicool.com/articles/JzAv6z -->
+
+把源码clone到本地库中。
+git clone my_git_site
+
+在本地新建一个与远程的0.2版本相同(被合并的版本)的0.2分支
+git checkout -b 0.2 origin/0.2
+
+返回到master版本
+git checkout master
+
+把本地的0.2合并到master
+git merge 0.2
+
+把本地的master同步到远程
+git push origin master
+
+<!-- Git 删除分支 http://blog.csdn.net/jrainbow/article/details/16858547 -->
+
+查看所有分支:
+git branch -a  
+
+删除HEAD分支
+git push origin --delete HEAD  
+
+查看本地分支下的文件
+ls
+
+删除raindow文件夹及其下所有的文件
+git rm raindow -r -f  
+
+同步删除操作到远程分支：
+git commit -m "delete raindow"  
+
+提交分支
+git push origin master  
